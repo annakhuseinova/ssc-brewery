@@ -106,7 +106,6 @@ class BeerControllerTest {
                 .andExpect(model().attribute("beer", hasProperty("id", is(uuid))));
     }
 
-    AuthenticationEntryPoint
     @Test
     void initCreationForm() throws Exception {
         mockMvc.perform(get("/beers/new"))

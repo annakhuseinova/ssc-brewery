@@ -1,6 +1,7 @@
 package guru.sfg.brewery.config;
 
 import guru.sfg.brewery.filter.RestHeaderAuthFilter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,6 +9,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -20,6 +26,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         restHeaderAuthFilter.setAuthenticationManager(authenticationManager);
         return restHeaderAuthFilter;
     }
+
+    @Bean
+    public PasswordEncoder delegatingPasswordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+//    @Bean
+//    public PasswordEncoder bCryptPassword(){
+//        return new BCryptPasswordEncoder();
+//    }
+
+//    @Bean
+//    public PasswordEncoder noOpPasswordEncoder(){
+//        return NoOpPasswordEncoder.getInstance();
+//    }
+
+    @Bean
+    public PasswordEncoder ldapPasswordEncoder(){
+        return new LdapShaPasswordEncoder();
+    }
+
+
     // By default, Spring Security turns on csrf protection.
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -53,6 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .roles()
                 .and()
                 .withUser("user")
+                // {noop} - use NoOp Password Encoder
                 .password("{noop}password")
                 .roles("USER");
 
